@@ -13,11 +13,10 @@ namespace CommitToProdTime
     {
         IDictionary<string, TimeSpan> deployTimes = new Dictionary<string, TimeSpan>();
         RestRequest request = new RestRequest(Method.GET);
-        
+
         static void Main(string[] args)
         {
             new Program();
-
         }
 
         public Program()
@@ -26,18 +25,16 @@ namespace CommitToProdTime
             request.AddHeader("cache-control", "no-cache");
             request.AddHeader("Authorization", "Basic OnFsbzJwbGJmNm5rbWRmaHU1enZ4cm1ia2htYjN1b2h0NHVwZHZxbHM0ZXU0dGZvbDZlaGE=");
 
-            //CLE(request);
-
-            URAX(request);
+            CLE();
+            URAX();
+            SOFTOFFER();
             new WriteToFile().Write(deployTimes);
-
-            //SOFTOFFER(request);
 
             Console.Write("Press any key to continue...");
             Console.ReadKey(true);
         }
 
-        private void CLE(RestRequest request)
+        private void CLE()
         {
             string DistanceCalculator = "1405";
             string FindOrder = "1442";
@@ -56,54 +53,122 @@ namespace CommitToProdTime
             string StockCarLive = "1433";
             string StockCarLiveCI = "1434";
 
+            
+
+
             IList<TimeSpan> CLETimes = new List<TimeSpan>();
+
             TimeSpan DistanceCalculatorTS = getDataFromAzureDevops(DistanceCalculator, request);
             CLETimes.Add(DistanceCalculatorTS);
+            deployTimes.Add("DistanceCalculatorTS", DistanceCalculatorTS);
+
             TimeSpan FindOrderTS = getDataFromAzureDevops(FindOrder, request);
             CLETimes.Add(FindOrderTS);
+            deployTimes.Add("FindOrderTS", FindOrderTS);
+
             TimeSpan GenericOrderFeedTS = getDataFromAzureDevops(GenericOrderFeed, request);
             CLETimes.Add(GenericOrderFeedTS);
+            deployTimes.Add("GenericOrderFeedTS", GenericOrderFeedTS);
+
             TimeSpan GOFTS = getDataFromAzureDevops(GOF, request);
             CLETimes.Add(GOFTS);
+            deployTimes.Add("GOFTS", GOFTS);
+
             TimeSpan GenericOrderFeedCITS = getDataFromAzureDevops(GenericOrderFeedCI, request);
             CLETimes.Add(GenericOrderFeedCITS);
+            deployTimes.Add("GenericOrderFeedCITS", GenericOrderFeedCITS);
+
             TimeSpan LoggingSDKTS = getDataFromAzureDevops(LoggingSDK, request);
             CLETimes.Add(LoggingSDKTS);
+            deployTimes.Add("LoggingSDKTS", LoggingSDKTS);
+
             TimeSpan OrderLoaderTS = getDataFromAzureDevops(OrderLoader, request);
             CLETimes.Add(OrderLoaderTS);
+            deployTimes.Add("OrderLoaderTS", OrderLoaderTS);
+
             TimeSpan PartnerFeedRDMTS = getDataFromAzureDevops(PartnerFeedRDM, request);
             CLETimes.Add(PartnerFeedRDMTS);
+            deployTimes.Add("PartnerFeedRDMTS", PartnerFeedRDMTS);
+
             TimeSpan PartnerFeedRDMCITS = getDataFromAzureDevops(PartnerFeedRDMCI, request);
             CLETimes.Add(PartnerFeedRDMCITS);
+            deployTimes.Add("PartnerFeedRDMCITS", PartnerFeedRDMCITS);
+
             TimeSpan PartnerGroupFeedTS = getDataFromAzureDevops(PartnerGroupFeed, request);
             CLETimes.Add(PartnerGroupFeedTS);
+            deployTimes.Add("PartnerGroupFeedTS", PartnerGroupFeedTS);
+
             TimeSpan RulesTS = getDataFromAzureDevops(Rules, request);
             CLETimes.Add(RulesTS);
+            deployTimes.Add("RulesTS", RulesTS);
+
             TimeSpan SearchServiceTS = getDataFromAzureDevops(SearchService, request);
             CLETimes.Add(SearchServiceTS);
+            deployTimes.Add("SearchServiceTS", SearchServiceTS);
+
             TimeSpan SearchServiceCITS = getDataFromAzureDevops(SearchServiceCI, request);
             CLETimes.Add(SearchServiceCITS);
+            deployTimes.Add("SearchServiceCITS", SearchServiceCITS);
+
             TimeSpan SQLServerDBCITS = getDataFromAzureDevops(SQLServerDBCI, request);
+            deployTimes.Add("SQLServerDBCITS", SQLServerDBCITS);
             CLETimes.Add(SQLServerDBCITS);
+
+
             TimeSpan StockCarLiveTS = getDataFromAzureDevops(StockCarLive, request);
+            deployTimes.Add("StockCarLiveTS", StockCarLiveTS);
             CLETimes.Add(StockCarLiveTS);
+
             TimeSpan StockCarLiveCITS = getDataFromAzureDevops(StockCarLiveCI, request);
+            deployTimes.Add("StockCarLiveCITS", StockCarLiveCITS);
             CLETimes.Add(StockCarLiveCITS);
 
             TimeSpan tempCleTimes = new TimeSpan(0);
-
-
-
             foreach(TimeSpan ts in CLETimes)
             {
-                tempCleTimes.Add(ts);
+                tempCleTimes = tempCleTimes.Add(ts);
             }
-            Console.WriteLine("CLE Total Time: " + tempCleTimes);
+            Console.WriteLine("CLE Total Time: " + tempCleTimes.TotalHours);
+            deployTimes.Add("CLE total build time" , tempCleTimes);
 
 
+            string defIdDistanceCalc = "15";
+            string defIdFindOrder = "21";
+            string defIdGof = "20";
+            string defIdHPLS = "27";
+            string defIdOrderLoader = "28";
+            string defIdPartnerFeedRDM = "16";
+            string defIdPartnerGroupFeed = "18";
+            string defIdRules = "17";
+            string defIdSearchService = "26";
+            string defIdStockCarLive = "19";
+
+            SaveTimesForRelease(request, defIdDistanceCalc, "DistanceCalc");
+            SaveTimesForRelease(request, defIdFindOrder, "FindOrder");
+            SaveTimesForRelease(request, defIdGof, "GOF");
+            SaveTimesForRelease(request, defIdHPLS, "HPLS");
+            SaveTimesForRelease(request, defIdOrderLoader, "OrderLoader");
+            SaveTimesForRelease(request, defIdPartnerFeedRDM, "PartnerFeedRDM");
+            SaveTimesForRelease(request, defIdPartnerGroupFeed, "PartnerGroupFeed");
+            SaveTimesForRelease(request, defIdRules, "Rules");
+            SaveTimesForRelease(request, defIdSearchService, "SearchService");
+            SaveTimesForRelease(request, defIdStockCarLive, "StockCarLive");
         }
 
-        private void SOFTOFFER(RestRequest request)
+
+        private void SaveTimesForRelease(RestRequest request, string defId, string name) 
+        {
+
+            var releases = GetDeployment(request, defId);
+            TimeSpan CLEDistCalcDevEnv = GetAvgTimeForEnviroment("Dev", releases);
+            TimeSpan CLEDistCalcQAEnv = GetAvgTimeForEnviroment("QA", releases);
+            TimeSpan CLEDistCalcProdEnv = GetAvgTimeForEnviroment("Prod", releases);
+            deployTimes.Add(name + "DevEnv", CLEDistCalcDevEnv);
+            deployTimes.Add(name + "QAEnv", CLEDistCalcQAEnv);
+            deployTimes.Add(name + "ProdEnv", CLEDistCalcProdEnv);
+        }
+
+        private void SOFTOFFER()
         {
             string SoftOffer = "87";
             string SoftOfferBuildPR = "73";
@@ -117,7 +182,12 @@ namespace CommitToProdTime
             var SOTimeSpanTimeSpan = getDataFromAzureDevops(SoftOffer, request);
             var SoftOfferWebTimeSPan = getDataFromAzureDevops(SoftOfferWeb, request);
             var SoftOfferWebBuildPRTimeSpan = getDataFromAzureDevops(SoftOfferWebBuildPR, request);
-            
+
+            deployTimes.Add("SoftOfferBuildPRTimeSpan", SoftOfferBuildPRTimeSpan);
+            deployTimes.Add("SOTimeSpanTimeSpan", SOTimeSpanTimeSpan);
+            deployTimes.Add("SoftOfferWebTimeSPan", SoftOfferWebTimeSPan);
+            deployTimes.Add("SoftOfferWebBuildPRTimeSpan", SoftOfferWebBuildPRTimeSpan);
+
             Console.WriteLine("Avg Build Time SoftOfferBuildPR: " + SoftOfferBuildPRTimeSpan);
             Console.WriteLine("Avg Build Time SoftOffer: " + SOTimeSpanTimeSpan);
             Console.WriteLine("Avg Build Time SoftOfferWeb: " + SoftOfferWebTimeSPan);
@@ -130,6 +200,12 @@ namespace CommitToProdTime
             TimeSpan SOTestEnv = GetAvgTimeForEnviroment("Test", releases);
             TimeSpan SOProdEnv = GetAvgTimeForEnviroment("Prod", releases);
 
+            deployTimes.Add("SODevEnv", SODevEnv);
+            deployTimes.Add("SOSysTestEnv", SOSysTestEnv);
+            deployTimes.Add("SOTestEnv", SOTestEnv);
+            deployTimes.Add("SOProdEnv", SOTestEnv);
+
+
             Console.WriteLine("-------SOFT OFFER------");
             Console.WriteLine("Avg Release Time Dev: " + SODevEnv);
             Console.WriteLine("Avg Release Time Sys Test: " + SOSysTestEnv);
@@ -137,7 +213,7 @@ namespace CommitToProdTime
             Console.WriteLine("Avg Release Time Prod: " + SOProdEnv);
 
             TimeSpan AvrageCommitToProdSoftOffer = SoftOfferBuildPRTimeSpan + SOTimeSpanTimeSpan+ SODevEnv+  SOSysTestEnv + SOSysTestEnv + SOProdEnv;
-            Console.WriteLine("Total Avrage Time SoftOffer Commit to Prod: " + AvrageCommitToProdSoftOffer.TotalHours);
+            Console.WriteLine("Total Avrage Time SoftOffer Commit to Prod: in Hours " + AvrageCommitToProdSoftOffer.TotalHours);
 
             releases = GetDeployment(request, definitionIdSOWeb);
 
@@ -146,6 +222,11 @@ namespace CommitToProdTime
              SOTestEnv = GetAvgTimeForEnviroment("Test", releases);
              SOProdEnv = GetAvgTimeForEnviroment("Prod", releases);
 
+            deployTimes.Add("SOWebDevEnv", SODevEnv);
+            deployTimes.Add("SOWebSysTestEnv", SOSysTestEnv);
+            deployTimes.Add("SOWebTestEnv", SOTestEnv);
+            deployTimes.Add("SOWebProdEnv", SODevEnv);
+
             Console.WriteLine("-------SOFT OFFER WEB------");
             Console.WriteLine("Avg Release Time Dev: " + SODevEnv);
             Console.WriteLine("Avg Release Time Sys Test: " + SOSysTestEnv);
@@ -153,12 +234,12 @@ namespace CommitToProdTime
             Console.WriteLine("Avg Release Time Prod: " + SOProdEnv);
 
             TimeSpan AvrageCommitToProdSoftOfferWeb = SoftOfferWebTimeSPan + SoftOfferWebBuildPRTimeSpan + SODevEnv + SOSysTestEnv + SOSysTestEnv + SOProdEnv;
-            Console.WriteLine("Total Avrage Time SoftOffer Web Commit to Prod: " + AvrageCommitToProdSoftOfferWeb.TotalHours);
+            Console.WriteLine("Total Avrage Time SoftOffer Web Commit to Prod in Hours: " + AvrageCommitToProdSoftOfferWeb.TotalHours);
 
 
         }
 
-        private void URAX(RestRequest request)
+        private void URAX()
         {
             string URAXPR = "1352";
             string URAXSF = "1353";
@@ -194,9 +275,9 @@ namespace CommitToProdTime
             Console.WriteLine("Avg Release Time Qa: " + URAXQaEnv);
             Console.WriteLine("Avg Release Time Prod: " + URAXProdEnv);
 
-            TimeSpan AvrageCommitToProdSoftOfferWeb = URAXPRTimeSpan + URAXSFTimeSpan + URAXDevEnv + URAXTestEnv + URAXQaEnv + URAXProdEnv;
-            deployTimes.Add("AvrageCommitToProdSoftOfferWeb", AvrageCommitToProdSoftOfferWeb);
-            Console.WriteLine("Total Avrage Time URAX Commit to Prod: " + AvrageCommitToProdSoftOfferWeb.TotalHours);
+            TimeSpan AvrageCommitToProdURAXWeb = URAXPRTimeSpan + URAXSFTimeSpan + URAXDevEnv + URAXTestEnv + URAXQaEnv + URAXProdEnv;
+            deployTimes.Add("AvrageCommitToProdURAXWeb", AvrageCommitToProdURAXWeb);
+            Console.WriteLine("Total Avrage Time URAX Commit to Prod: " + AvrageCommitToProdURAXWeb.TotalHours);
             Console.WriteLine("----------------------------");
         }
 
@@ -212,7 +293,8 @@ namespace CommitToProdTime
                     {
                         if(envs.TryGetValue("QA", out Environment tempTimeEnv))
                         {
-                            if (envs.TryGetValue(environment, out Environment EnvTimes))
+                            if (envs.TryGetValue(environment, out Environment EnvTimes) ||
+                                envs.TryGetValue(environment.ToUpper(), out EnvTimes))
                             {
                                 totalTime = totalTime = totalTime.Add(EnvTimes.finishTime - tempTimeEnv.finishTime);
                                 count++;
@@ -229,6 +311,14 @@ namespace CommitToProdTime
                     }else if (environment.Equals("QA"))
                     {
                         if (envs.TryGetValue("Test", out Environment tempTimeEnv))
+                        {
+                            if (envs.TryGetValue(environment, out Environment EnvTimes))
+                            {
+                                totalTime = totalTime = totalTime.Add(EnvTimes.finishTime - tempTimeEnv.finishTime);
+                                count++;
+                            }
+                        }
+                        if (envs.TryGetValue("DEV", out tempTimeEnv))
                         {
                             if (envs.TryGetValue(environment, out Environment EnvTimes))
                             {
@@ -269,7 +359,8 @@ namespace CommitToProdTime
                     }
                     else if (environment.Equals("Dev"))
                     {
-                        if (envs.TryGetValue(environment, out Environment EnvTimes))
+                        if (envs.TryGetValue(environment, out Environment EnvTimes) ||
+                            envs.TryGetValue(environment.ToUpper(), out EnvTimes))
                         {
 
                             DateTime finishTimeOfBuild = getFinishTimeOfBuild("https://volvocargroup.visualstudio.com/DSPA/_apis/build/builds?api-version=5.0&buildIds=" + r.buildId);

@@ -22,31 +22,38 @@ namespace CommitToProdTime
         internal void Write(IDictionary<string, TimeSpan> deployTimes)
         {
             string filePath = DownloadFilesFromSharePoint();
-            TimeSpan[] valueArray = new TimeSpan[deployTimes.Count];
+            
+            string[] valueArrayString = new string[deployTimes.Count+1];
+
+            valueArrayString[0] = DateTime.Now.ToString();
+
+
+            var keys = deployTimes.Keys;
+            string[] keysArray = new string[keys.Count+1];
+            int j = 1;
+            var format = new StringBuilder();
+            format.Append("{0};");
+            keysArray[0] = "Date";
+            foreach (var key in keys)
+            {
+                keysArray[j] = key;
+                deployTimes.TryGetValue(key, out TimeSpan time);
+                valueArrayString[j] = time.ToString();
+                format.Append("{" + j + "};");
+                j++;
+            }
+            format.Remove(format.Length - 1, 1);
             if (filePath.Equals(""))
             {
                 filePath = Path.GetTempPath() + Guid.NewGuid().ToString() + ".csv";
                 
                 using (FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
                 {
-                    var keys = deployTimes.Keys;
-
-                    string[] keysArray = new string[keys.Count];
-                    
-                    int j = 0;
-                    foreach (var key in keys)
-                    {
-                        keysArray[j] = key;
-                        deployTimes.TryGetValue(key, out TimeSpan time);
-                        valueArray[j] = time;
-                        j++;
-
-                    }
-
-
-                    
-                    string headfing = string.Format("{0};{1};{2};{3};{4};{5};{6};{7}", "Date", keysArray[0], keysArray[1], keysArray[2], keysArray[3],
-                        keysArray[4], keysArray[5], keysArray[6]);
+                    string headfing = string.Format(format.ToString(), keysArray);
+                 //   string headfing = string.Format(format.ToString(), "Date", keysArray[0], keysArray[1], keysArray[2], keysArray[3],
+                 //       keysArray[4], keysArray[5], keysArray[6], keysArray[7], keysArray[8], keysArray[9], keysArray[10], keysArray[11], 
+                 //       keysArray[12], keysArray[13], keysArray[14], keysArray[15], keysArray[16], keysArray[17], keysArray[18], 
+                 //       keysArray[19], keysArray[20], keysArray[21], keysArray[22]);
                     byte[] array = Encoding.ASCII.GetBytes(headfing + System.Environment.NewLine);
                     for (int i = 0; i < array.Length; i++)
                     {
@@ -56,8 +63,12 @@ namespace CommitToProdTime
                 }
             }
             var csv = new StringBuilder();
-            string line = string.Format("{0};{1};{2};{3};{4};{5};{6};{7}", DateTime.Now, valueArray[0], valueArray[1], valueArray[2],
-                valueArray[3], valueArray[4], valueArray[5], valueArray[6]);
+            string line = string.Format(format.ToString(), valueArrayString);
+            //string line = string.Format(format.ToString(), DateTime.Now, 
+            //    valueArray[0], valueArray[1], valueArray[2], valueArray[3], valueArray[4], valueArray[5], valueArray[6],
+            //    valueArray[7], valueArray[8], valueArray[9], valueArray[10], valueArray[11],
+            //            valueArray[12], valueArray[13], valueArray[14], valueArray[15], valueArray[16], valueArray[17], valueArray[18],
+            //            valueArray[19], valueArray[20], valueArray[21], valueArray[22]);
             csv.AppendLine(line);
             System.IO.File.AppendAllText(filePath, line + System.Environment.NewLine);
 
@@ -132,17 +143,20 @@ namespace CommitToProdTime
                 clientContext.ExecuteQuery();
                 foreach (File file in files)
                 {
-                    FileInformation fileInfo = File.OpenBinaryDirect(clientContext, file.ServerRelativeUrl);
-                    clientContext.ExecuteQuery();
+                    if (file.Name.Equals(fileName))
+                    {
+                        FileInformation fileInfo = File.OpenBinaryDirect(clientContext, file.ServerRelativeUrl);
+                        clientContext.ExecuteQuery();
 
-                    var filePath = Path.GetTempPath() + Guid.NewGuid().ToString() + ".csv";
-                    FileStream fileStream = new FileStream(filePath, System.IO.FileMode.OpenOrCreate, System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite);
+                        var filePath = Path.GetTempPath() + Guid.NewGuid().ToString() + ".csv";
+                        FileStream fileStream = new FileStream(filePath, System.IO.FileMode.OpenOrCreate, System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite);
 
-                    fileInfo.Stream.CopyTo(fileStream);
-                    fileStream.Flush();
-                    fileStream.Close();
-                    Console.WriteLine("Downloading Files Completed");
-                    return filePath;
+                        fileInfo.Stream.CopyTo(fileStream);
+                        fileStream.Flush();
+                        fileStream.Close();
+                        Console.WriteLine("Downloading Files Completed");
+                        return filePath;
+                    }
 
                 }
             }
