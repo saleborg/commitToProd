@@ -203,7 +203,7 @@ namespace CommitToProdTime
             deployTimes.Add("SODevEnv", SODevEnv);
             deployTimes.Add("SOSysTestEnv", SOSysTestEnv);
             deployTimes.Add("SOTestEnv", SOTestEnv);
-            deployTimes.Add("SOProdEnv", SOTestEnv);
+            deployTimes.Add("SOProdEnv", SOProdEnv);
 
 
             Console.WriteLine("-------SOFT OFFER------");
@@ -214,6 +214,7 @@ namespace CommitToProdTime
 
             TimeSpan AvrageCommitToProdSoftOffer = SoftOfferBuildPRTimeSpan + SOTimeSpanTimeSpan+ SODevEnv+  SOSysTestEnv + SOSysTestEnv + SOProdEnv;
             Console.WriteLine("Total Avrage Time SoftOffer Commit to Prod: in Hours " + AvrageCommitToProdSoftOffer.TotalHours);
+            deployTimes.Add("AvrageCommitToProdSoftOffer", AvrageCommitToProdSoftOffer);
 
             releases = GetDeployment(request, definitionIdSOWeb);
 
@@ -225,7 +226,7 @@ namespace CommitToProdTime
             deployTimes.Add("SOWebDevEnv", SODevEnv);
             deployTimes.Add("SOWebSysTestEnv", SOSysTestEnv);
             deployTimes.Add("SOWebTestEnv", SOTestEnv);
-            deployTimes.Add("SOWebProdEnv", SODevEnv);
+            deployTimes.Add("SOWebProdEnv", SOProdEnv);
 
             Console.WriteLine("-------SOFT OFFER WEB------");
             Console.WriteLine("Avg Release Time Dev: " + SODevEnv);
@@ -235,7 +236,7 @@ namespace CommitToProdTime
 
             TimeSpan AvrageCommitToProdSoftOfferWeb = SoftOfferWebTimeSPan + SoftOfferWebBuildPRTimeSpan + SODevEnv + SOSysTestEnv + SOSysTestEnv + SOProdEnv;
             Console.WriteLine("Total Avrage Time SoftOffer Web Commit to Prod in Hours: " + AvrageCommitToProdSoftOfferWeb.TotalHours);
-
+            deployTimes.Add("AvrageCommitToProdSoftOfferWeb", AvrageCommitToProdSoftOfferWeb);
 
         }
 
